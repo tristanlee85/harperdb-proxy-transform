@@ -127,11 +127,7 @@ export function start(options = {}) {
 
 	return {
 		async handleDirectory(_, componentPath) {
-			if (configured) {
-				return;
-			}
-			configured = true;
-
+			logInfo(`handleDirectory called:\n\n${componentPath}\n\n${JSON.stringify(_, null, 2)}\n\n`);
 			logInfo(`Setting up Express.js app...`);
 			let middlewareFn;
 			let transformReqOptionsFn;
