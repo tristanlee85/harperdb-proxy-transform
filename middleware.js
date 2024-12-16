@@ -1,10 +1,7 @@
 // middleware.js
-export default (options) => {
-	return (req, res, next) => {
-		// Example logic using options
-		console.log(`Middleware activated with options:`, options);
+export default (req, res, next) => {
+	// TODO: Add middleware logic here
 
-		// Call next to pass control to the next middleware
-		next();
-	};
+	// Call next to pass control to the next middleware
+	next();
 };

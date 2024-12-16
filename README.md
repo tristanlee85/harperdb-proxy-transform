@@ -55,12 +55,12 @@ The subpath to proxy requests to. Defaults to `/`.
 
 ### `middlewarePath`
 
-The path to the middleware file which exports a function that returns an Express middleware function.
+The path to the middleware file which exports an Express middleware function.
 This middleware will be applied prior to the proxy transformation middleware. See [middleware.js](./middleware.js) for an example.
 
 ### `transformerPath`
 
-The path to the transformer file. This file exports functions that will be used to transform the request and response. See [transformer.js](./transformer.js) for an example.
+The path to the transformer file. This file contain named exports that will be used to transform the request and response. See [transformer.js](./transformer.js) for an example.
 
 ### `staticPath`
 

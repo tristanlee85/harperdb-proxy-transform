@@ -5,13 +5,16 @@ import express from 'express';
 import proxy from 'express-http-proxy';
 import { getPort } from 'get-port-please';
 
+global.extensionCount = global.extensionCount ?? 0;
+global.extensionCount++;
+
 /**
  * Patch `logger` methods to include prefix
  */
 ['info', 'debug', 'error', 'warn'].forEach((method) => {
 	const fn = logger[method];
 	logger[method] = (message) => {
-		fn(`[harperdb-proxy-transform-1] ${message}`);
+		fn(`[harperdb-proxy-transform-${global.extensionCount}] ${message}`);
 	};
 });
 
@@ -77,6 +80,7 @@ function assertType(name, option, expectedType) {
  * @returns {Required<ExtensionOptions>}
  */
 function resolveConfig(options) {
+	logger.info(`Resolving extension options...\n\n${JSON.stringify(options, null, 2)}\n\n`);
 	assertType('port', options.port, 'number');
 	assertType('subPath', options.subPath, 'string');
 	assertType('middlewarePath', options.middlewarePath, 'string');
