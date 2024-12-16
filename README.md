@@ -1,15 +1,67 @@
-# HarperDB Application Template
+# HarperDB Express Proxy Transform
 
-This is a template for building [HarperDB](https://www.harperdb.io/) applications. You can download this repository as a starting point for building applications with HarperDB. To get started, make sure you have [installed HarperDB](https://docs.harperdb.io/docs/install-harperdb), which can be quickly done with `npm install -g harperdb`. You can run your application from the directory where you downloaded the contents of this repository with:
+A [HarperDB Component](https://docs.harperdb.io/docs/developers/components) for proxying requests using an Express server.
 
-`harperdb run /path/to/your-app`
+## Usage
 
-(or if you enter that directory, you can run the current directory as `harperdb run .`).
+> [!NOTE]
+> This guide assumes you're already familiar with [HarperDb Components](https://docs.harperdb.io/docs/developers/components). Check out [`harperdb-proxy-transform-example`](https://github.com/tristanlee85/harperdb-proxy-transform-example) for more information.
 
-For more information about getting started with HarperDB and building applications, see our getting started guide.
+1. Install:
 
-This template includes the [default configuration](./config.yaml), which specifies how files are handled in your application.
+```sh
+npm install git+ssh://git@github.com:tristanlee85/harperdb-proxy-transform.git --save
+```
 
-The [schema.graphql](./schema.graphql) is the schema definition. This is the main starting point for defining your database schema, specifying which tables you want and what attributes/fields they should have.
+2. Add to `config.yaml`:
 
-The [resources.js](./resources.js) provides a template for defining JavaScript resource classes, for customized application logic in your endpoints.
+```yaml
+'harperdb-proxy-transform':
+  package: 'harperdb-proxy-transform'
+  files: /*
+  # Optional:
+  # port: 3000 # default 3000
+  # subPath: /api # default /
+  # middlewarePath: middleware.js # default ''
+  # transformerPath: transforms.js # default ''
+  # staticPath: public # default ''
+```
+
+3. Run your app with HarperDB:
+
+```sh
+harperdb run .
+```
+
+## Extension Options
+
+```ts
+interface ExtensionOptions {
+	port?: number;
+	subPath?: string;
+	middlewarePath?: string;
+	transformerPath?: string;
+	staticPath?: string;
+}
+```
+
+### `port`
+
+The port to run the Express server on. Defaults to `3000`.
+
+### `subPath`
+
+The subpath to proxy requests to. Defaults to `/`.
+
+### `middlewarePath`
+
+The path to the middleware file which exports a function that returns an Express middleware function.
+This middleware will be applied prior to the proxy transformation middleware. See [middleware.js](./middleware.js) for an example.
+
+### `transformerPath`
+
+The path to the transformer file. This file exports functions that will be used to transform the request and response. See [transformer.js](./transformer.js) for an example.
+
+### `staticPath`
+
+The path to the static files. Defaults to `''`.

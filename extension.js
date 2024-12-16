@@ -3,7 +3,7 @@ import path from 'node:path';
 import assert from 'node:assert';
 import express from 'express';
 import proxy from 'express-http-proxy';
-import { getPortPromise as getPort } from 'portfinder';
+import { getPort } from 'get-port-please';
 
 /**
  * Patch `logger` methods to include prefix
@@ -266,7 +266,7 @@ export function start(options = {}) {
 
 			// Start the Express server on the available port
 			const startPort = config.port;
-			const port = await getPort({ host: 'localhost', startPort, stopPort: startPort + 5 });
+			const port = await getPort({ portRange: [startPort, startPort + 5] });
 
 			if (port !== startPort) {
 				logger.warn(`Port ${startPort} is already in use. Using port ${port} instead.`);
