@@ -4,7 +4,6 @@ import assert from 'node:assert';
 import express from 'express';
 import proxy from 'express-http-proxy';
 import { getPort } from 'get-port-please';
-import { logger } from 'harperdb';
 
 global.extensionCount = global.extensionCount ?? 0;
 global.extensionCount++;
