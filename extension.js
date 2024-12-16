@@ -120,12 +120,18 @@ function resolveConfig(options) {
  * @returns
  */
 export function start(options = {}) {
+	let configured = false;
 	const config = resolveConfig(options);
 
 	logInfo(`Starting extension...`);
 
 	return {
 		async handleDirectory(_, componentPath) {
+			if (configured) {
+				return;
+			}
+			configured = true;
+
 			logInfo(`Setting up Express.js app...`);
 			let middlewareFn;
 			let transformReqOptionsFn;
