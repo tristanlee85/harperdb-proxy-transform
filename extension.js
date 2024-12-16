@@ -4,6 +4,7 @@ import assert from 'node:assert';
 import express from 'express';
 import proxy from 'express-http-proxy';
 import { getPort } from 'get-port-please';
+import { logger } from 'harperdb';
 
 global.extensionCount = global.extensionCount ?? 0;
 global.extensionCount++;
@@ -13,9 +14,9 @@ logger.info(`extensionCount: ${global.extensionCount}`);
 /**
  * Patch `logger` methods to include prefix
  */
-['info', 'debug', 'error', 'warn'].forEach((method) => {
+const [logInfo, logDebug, logError, logWarn] = ['info', 'debug', 'error', 'warn'].map((method) => {
 	const fn = logger[method];
-	logger[method] = (message) => {
+	return (message) => {
 		fn(`[harperdb-proxy-transform-${global.extensionCount}] ${message}`);
 	};
 });
@@ -82,7 +83,7 @@ function assertType(name, option, expectedType) {
  * @returns {Required<ExtensionOptions>}
  */
 function resolveConfig(options) {
-	logger.info(`Resolving extension options...\n\n${JSON.stringify(options, null, 2)}\n\n`);
+	logInfo(`Resolving extension options...\n\n${JSON.stringify(options, null, 2)}\n\n`);
 	assertType('port', options.port, 'number');
 	assertType('subPath', options.subPath, 'string');
 	assertType('middlewarePath', options.middlewarePath, 'string');
@@ -122,11 +123,11 @@ function resolveConfig(options) {
 export function start(options = {}) {
 	const config = resolveConfig(options);
 
-	logger.info(`Starting extension...`);
+	logInfo(`Starting extension...`);
 
 	return {
 		async handleDirectory(_, componentPath) {
-			logger.info(`Setting up Express.js app...`);
+			logInfo(`Setting up Express.js app...`);
 			let middlewareFn;
 			let transformReqOptionsFn;
 			let transformReqPathFn;
@@ -195,7 +196,7 @@ export function start(options = {}) {
 			});
 
 			if (middlewareFn) {
-				logger.info(`Using middleware: ${config.middlewarePath}`);
+				logInfo(`Using middleware: ${config.middlewarePath}`);
 				app.use(middlewareFn);
 			}
 
@@ -225,7 +226,7 @@ export function start(options = {}) {
 
 			// Configure route patterns with proxying and response handling
 			// config.routes.forEach(({ pattern, host }) => {
-			// 	logger.info(`Setting up route: ${pattern} -> ${host}`);
+			// 	logInfo(`Setting up route: ${pattern} -> ${host}`);
 			// 	app.use(
 			// 		pattern,
 			// 		proxy(host, {
@@ -249,7 +250,7 @@ export function start(options = {}) {
 				const staticPath = path.join(componentPath, config.staticPath);
 				if (fs.existsSync(staticPath)) {
 					app.use(express.static(staticPath));
-					logger.info(`Serving static files from: ${staticPath}`);
+					logInfo(`Serving static files from: ${staticPath}`);
 				}
 			}
 
@@ -257,11 +258,11 @@ export function start(options = {}) {
 			options.server.http(async (request, nextHandler) => {
 				const { _nodeRequest: req, _nodeResponse: res } = request;
 
-				logger.info(`Incoming request: ${req.url}`);
+				logInfo(`Incoming request: ${req.url}`);
 
 				app.handle(req, res, (err) => {
 					if (err) {
-						logger.error(`Error handling request: ${err.message}`);
+						logError(`Error handling request: ${err.message}`);
 						res.statusCode = 500;
 						res.end('Internal Server Error');
 					} else {
@@ -275,11 +276,11 @@ export function start(options = {}) {
 			const port = await getPort({ portRange: [startPort, startPort + 5] });
 
 			if (port !== startPort) {
-				logger.warn(`Port ${startPort} is already in use. Using port ${port} instead.`);
+				logWarn(`Port ${startPort} is already in use. Using port ${port} instead.`);
 			}
 
 			app.listen(port, () => {
-				logger.info(`Started Express.js server on port ${port}`);
+				logInfo(`Started Express.js server on port ${port}`);
 			});
 
 			return true;
