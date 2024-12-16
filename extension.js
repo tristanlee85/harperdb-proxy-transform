@@ -3,7 +3,6 @@ import path from 'node:path';
 import assert from 'node:assert';
 import express from 'express';
 import proxy from 'express-http-proxy';
-import { getPort } from 'get-port-please';
 
 global.extensionCount = global.extensionCount ?? 0;
 global.extensionCount++;
@@ -55,7 +54,6 @@ const determineProxyHost = ({ headers }) => {
 
 /**
  * @typedef {Object} ExtensionOptions - The configuration options for the extension.
- * @property {number=} port - A port for the Express.js server. Defaults to 3000.
  * @property {string=} subPath - A sub path for serving requests from. Defaults to `''`.
  * @property {string=} middlewarePath - A path to a middleware file to be used by the Express.js server.
  * @property {string=} transformerPath - A path to a transformer file to be used by the Express.js server.
@@ -83,7 +81,6 @@ function assertType(name, option, expectedType) {
  */
 function resolveConfig(options) {
 	logInfo(`Resolving extension options...\n\n${JSON.stringify(options, null, 2)}\n\n`);
-	assertType('port', options.port, 'number');
 	assertType('subPath', options.subPath, 'string');
 	assertType('middlewarePath', options.middlewarePath, 'string');
 	assertType('transformerPath', options.transformerPath, 'string');
@@ -99,7 +96,6 @@ function resolveConfig(options) {
 	}
 
 	return {
-		port: options.port ?? 3000,
 		subPath: options.subPath ?? '',
 		middlewarePath: options.middlewarePath ?? '',
 		transformerPath: options.transformerPath ?? '',
@@ -270,18 +266,6 @@ export function start(options = {}) {
 						nextHandler(request);
 					}
 				});
-			});
-
-			// Start the Express server on the available port
-			const startPort = config.port;
-			const port = await getPort({ portRange: [startPort, startPort + 5] });
-
-			if (port !== startPort) {
-				logWarn(`Port ${startPort} is already in use. Using port ${port} instead.`);
-			}
-
-			app.listen(port, () => {
-				logInfo(`Started Express.js server on port ${port}`);
 			});
 
 			return true;
