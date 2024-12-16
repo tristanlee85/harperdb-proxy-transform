@@ -8,6 +8,8 @@ import { getPort } from 'get-port-please';
 global.extensionCount = global.extensionCount ?? 0;
 global.extensionCount++;
 
+logger.info(`extensionCount: ${global.extensionCount}`);
+
 /**
  * Patch `logger` methods to include prefix
  */
