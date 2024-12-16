@@ -8,10 +8,10 @@ import { getPort } from 'get-port-please';
 /**
  * Patch `logger` methods to include prefix
  */
-['info', 'debug', 'error'].forEach((method) => {
+['info', 'debug', 'error', 'warn'].forEach((method) => {
 	const fn = logger[method];
 	logger[method] = (message) => {
-		fn(`[harperdb-proxy-transform] ${message}`);
+		fn(`[harperdb-proxy-transform-1] ${message}`);
 	};
 });
 
@@ -273,7 +273,7 @@ export function start(options = {}) {
 			}
 
 			app.listen(port, () => {
-				logger.info(`Express.js server is running on port ${port}`);
+				logger.info(`Started Express.js server on port ${port}`);
 			});
 
 			return true;
