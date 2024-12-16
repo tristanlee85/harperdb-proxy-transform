@@ -266,7 +266,7 @@ export function start(options = {}) {
 
 			// Start the Express server on the available port
 			const startPort = config.port;
-			const port = await getPort({ startPort, stopPort: startPort + 5 });
+			const port = startPort; //await getPort({ startPort, stopPort: startPort + 5 });
 
 			if (port !== startPort) {
 				logger.warn(`Port ${startPort} is already in use. Using port ${port} instead.`);
