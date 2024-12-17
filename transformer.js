@@ -1,29 +1,16 @@
 /**
- * @see {import('express-http-proxy').ProxyOptions.proxyReqOptDecorator}
- * @param {import('http').RequestOptions} reqOptions
- * @returns {import('http').RequestOptions}
+ * @param {import('http').IncomingMessage} req
+ * @returns {void}
  */
-export function transformRequestOptions(reqOptions) {
-	return reqOptions;
+export function transformRequest(req) {
+	// TODO: Implement request transformation
 }
 
 /**
- * @see {import('express-http-proxy').ProxyOptions.proxyReqPathResolver}
- * @param {import('express').Request} req
- * @returns {string}
+ * @param {import('http').IncomingMessage} res
+ * @param {import('http').IncomingMessage} req
+ * @returns {void}
  */
-export function transformRequestPath(req) {
-	return req.url;
-}
-
-/**
- * @see {import('express-http-proxy').ProxyOptions.userResDecorator}
- * @param {import('http').IncomingMessage} proxyRes
- * @param {any} proxyResData
- * @param {import('express').Request} req
- * @param {import('express').Response} res
- * @returns {any}
- */
-export function transformResponse(proxyRes, proxyResData, req, res) {
-	return proxyResData;
+export function transformResponse(res, req) {
+	// TODO: Implement response transformation
 }

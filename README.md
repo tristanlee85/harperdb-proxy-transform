@@ -1,6 +1,6 @@
-# HarperDB Express Proxy Transform
+# HarperDB Proxy Transform
 
-A [HarperDB Component](https://docs.harperdb.io/docs/developers/components) for proxying requests using an Express server.
+A [HarperDB Component](https://docs.harperdb.io/docs/developers/components) for proxying upstream requests to an origin server.
 
 ## Usage
 
@@ -19,12 +19,7 @@ npm install git+ssh://git@github.com:tristanlee85/harperdb-proxy-transform.git -
 'harperdb-proxy-transform':
   package: 'harperdb-proxy-transform'
   files: /*
-  # Optional:
-  # port: 3000 # default 3000
-  # subPath: /api # default /
-  # middlewarePath: middleware.js # default ''
   # transformerPath: transforms.js # default ''
-  # staticPath: public # default ''
 ```
 
 3. Run your app with HarperDB:
@@ -37,31 +32,30 @@ harperdb run .
 
 ```ts
 interface ExtensionOptions {
-	port?: number;
-	subPath?: string;
-	middlewarePath?: string;
 	transformerPath?: string;
-	staticPath?: string;
 }
 ```
 
-### `port`
+- `transformerPath`: The path to the transformer file. This file contain named exports that will be used to transform the request and response. See [transformer.js](./transformer.js) for an example.
 
-The port to run the Express server on. Defaults to `3000`.
+## Building
 
-### `subPath`
+This extension is built using [`Bun`](https://bun.sh). To get started, install Bun globally:
 
-The subpath to proxy requests to. Defaults to `/`.
+```sh
+npm install -g bun
+```
 
-### `middlewarePath`
+Then, run the following command to build the extension:
 
-The path to the middleware file which exports an Express middleware function.
-This middleware will be applied prior to the proxy transformation middleware. See [middleware.js](./middleware.js) for an example.
+```sh
+bun run build
+```
 
-### `transformerPath`
+This will create a `dist` directory with the built extension bundled for Node.js.
 
-The path to the transformer file. This file contain named exports that will be used to transform the request and response. See [transformer.js](./transformer.js) for an example.
+If you are developing, you can use the `watch` script to automatically rebuild the extension when you make changes to the source code.
 
-### `staticPath`
-
-The path to the static files. Defaults to `''`.
+```sh
+bun run watch
+```
