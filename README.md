@@ -28,7 +28,7 @@ npm install git+ssh://git@github.com:tristanlee85/harperdb-proxy-transform.git -
 harperdb run .
 ```
 
-## Extension Options
+### Extension Options
 
 ```ts
 interface ExtensionOptions {

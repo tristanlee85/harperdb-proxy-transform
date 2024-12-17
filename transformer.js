@@ -10,7 +10,7 @@ export function transformRequest(req) {
  * @param {Buffer} rawBody
  * @param {import('http').IncomingMessage} res
  * @param {import('http').ClientRequest} req
- * @returns {Buffer}
+ * @returns {Buffer | string | undefined}
  */
 export function transformResponse(rawBody, res, req) {
 	// TODO: Implement response transformation
