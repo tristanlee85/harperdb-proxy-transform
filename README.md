@@ -7,7 +7,7 @@ A [HarperDB Component](https://docs.harperdb.io/docs/developers/components) for 
 > [!NOTE]
 > This guide assumes you're already familiar with [HarperDb Components](https://docs.harperdb.io/docs/developers/components). Check out [`harperdb-proxy-transform-example`](https://github.com/tristanlee85/harperdb-proxy-transform-example) for more information.
 
-1. Install:
+1. Add this extension to your HarperDB project:
 
 ```sh
 npm install git+ssh://git@github.com:tristanlee85/harperdb-proxy-transform.git --save
