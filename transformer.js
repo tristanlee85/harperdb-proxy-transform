@@ -1,5 +1,5 @@
 /**
- * @param {import('http').IncomingMessage} req
+ * @param {import('http').ClientRequest} req
  * @returns {void}
  */
 export function transformRequest(req) {

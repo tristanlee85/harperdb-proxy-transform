@@ -18,12 +18,6 @@ const [logInfo, logDebug, logError, logWarn] = ['info', 'debug', 'error', 'warn'
 });
 
 /**
- * @typedef {Object} Transformer
- * @property {function(Request): void} transformRequest - Function to transform request.
- * @property {function(Response): void} transformResponse - Function to transform response.
- */
-
-/**
  * Define a list of allowed hosts to validate an incoming `x-forwarded-host`
  * header that could be used to make this more dynamic in the future.
  *
@@ -122,26 +116,34 @@ export function start(options: any) {
 			options.server.http(async (request: any, nextHandler: any) => {
 				const { _nodeRequest: req, _nodeResponse: res } = request;
 
+				const { transformRequest, transformResponse } = request.edgio?.proxyHandler ?? {};
+
+				// Per-request transformers should override those defined in the extension
+				if (transformRequest) {
+					transformReqFn = transformRequest;
+				}
+				if (transformResponse) {
+					transformResFn = transformResponse;
+				}
+
 				try {
-					logDebug(`Incoming request: ${req.url}`);
+					logDebug(`Incoming request: ${req.url.split('?')[0]}`);
 
 					if (transformReqFn) {
 						await transformReqFn(req);
 					}
 
 					// TODO: this property will should be defined by the edge-control-parser extension
-					req.edgio = {
-						scheme: 'https',
-						host: 'www.google.com',
-					};
-					req.headers.host = 'www.google.com';
+					const scheme = 'https';
+					const host = 'www.google.com';
+					req.headers.host = host;
 
-					const protocol = req.edgio?.scheme === 'https' ? https : http;
+					const protocol = scheme === 'https' ? https : http;
 
 					const upstreamOptions = {
 						method: req.method,
-						hostname: req.edgio?.host,
-						port: req.edgio?.scheme === 'https' ? 443 : 80,
+						hostname: host,
+						port: scheme === 'https' ? 443 : 80,
 						path: req.url,
 						headers: req.headers,
 					};

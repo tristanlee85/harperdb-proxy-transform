@@ -1,4 +1,4 @@
-import zlib from 'zlib';
+import zlib from 'node:zlib';
 
 /**
  * Decompress the body based on the Content-Encoding header.

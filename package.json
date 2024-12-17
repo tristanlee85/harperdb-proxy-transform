@@ -25,14 +25,13 @@
 	"prettier": "@harperdb/code-guidelines/prettier",
 	"scripts": {
 		"build": "bun build src/extension.ts --outdir dist --target node",
-		"watch": "chokidar 'src/**/*.ts' -c 'bun run build'",
+		"watch": "bun run build && chokidar 'src/**/*.ts' -c 'bun run build'",
 		"format": "prettier .",
 		"format:check": "npm run format -- --check",
 		"format:fix": "npm run format -- --write"
 	},
 	"type": "module",
 	"dependencies": {
-		"chokidar-cli": "^3.0.0",
-		"zlib": "^1.0.5"
+		"chokidar-cli": "^3.0.0"
 	}
 }

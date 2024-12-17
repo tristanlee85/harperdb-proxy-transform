@@ -6,7 +6,7 @@ import http from "node:http";
 import https from "node:https";
 
 // src/utils/compression.ts
-import zlib from "zlib";
+import zlib from "node:zlib";
 async function decompress(body, encoding) {
   switch (encoding) {
     case "gzip":
@@ -73,21 +73,26 @@ function start(options) {
       }
       options.server.http(async (request, nextHandler) => {
         const { _nodeRequest: req, _nodeResponse: res } = request;
+        const { transformRequest, transformResponse } = request.edgio?.proxyHandler ?? {};
+        if (transformRequest) {
+          transformReqFn = transformRequest;
+        }
+        if (transformResponse) {
+          transformResFn = transformResponse;
+        }
         try {
-          logDebug(`Incoming request: ${req.url}`);
+          logDebug(`Incoming request: ${req.url.split("?")[0]}`);
           if (transformReqFn) {
             await transformReqFn(req);
           }
-          req.edgio = {
-            scheme: "https",
-            host: "www.google.com"
-          };
-          req.headers.host = "www.google.com";
-          const protocol = req.edgio?.scheme === "https" ? https : http;
+          const scheme = "https";
+          const host = "www.google.com";
+          req.headers.host = host;
+          const protocol = scheme === "https" ? https : http;
           const upstreamOptions = {
             method: req.method,
-            hostname: req.edgio?.host,
-            port: req.edgio?.scheme === "https" ? 443 : 80,
+            hostname: host,
+            port: scheme === "https" ? 443 : 80,
             path: req.url,
             headers: req.headers
           };
