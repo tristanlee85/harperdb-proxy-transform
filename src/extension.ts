@@ -3,7 +3,7 @@ import path from 'node:path';
 import assert from 'node:assert';
 import http from 'node:http';
 import https from 'node:https';
-import { pipeline } from 'node:stream';
+import { decompress, compress } from './utils/compression';
 
 declare const logger: any;
 
@@ -96,8 +96,8 @@ export function start(options: any) {
 
 	return {
 		async handleDirectory(_: any, componentPath: string) {
-			let transformReqFn: Function | undefined;
-			let transformResFn: Function | undefined;
+			let transformReqFn: ((req: any) => Promise<void>) | undefined;
+			let transformResFn: ((rawBody: Buffer, res: any, req: any) => Promise<Buffer | string | undefined>) | undefined;
 
 			if (!fs.existsSync(componentPath) || !fs.statSync(componentPath).isDirectory()) {
 				throw new Error(`Invalid component path: ${componentPath}`);
@@ -133,6 +133,8 @@ export function start(options: any) {
 						scheme: 'https',
 						host: 'www.google.com',
 					};
+					// override host header
+					req.headers.host = 'www.google.com';
 
 					const protocol = req.edgio?.scheme === 'https' ? https : http;
 
@@ -144,27 +146,45 @@ export function start(options: any) {
 						headers: req.headers,
 					};
 
-					const proxyReq = protocol.request(upstreamOptions, async (proxyRes) => {
-						if (transformResFn) {
-							await transformResFn(proxyRes, proxyReq);
-						}
+					const proxyReq = protocol.request(upstreamOptions, (proxyRes) => {
+						logDebug(`Received response from upstream: ${proxyRes.statusCode}`);
 
-						res.writeHead(proxyRes.statusCode, proxyRes.headers);
-						pipeline(proxyRes, res, (err: any) => {
-							if (err) {
-								logError(`Error piping response: ${err}`);
-								res.end();
+						const encoding = proxyRes.headers['content-encoding'];
+						const chunks: any[] = [];
+						proxyRes.on('data', (chunk) => chunks.push(chunk));
+
+						proxyRes.on('end', async () => {
+							let body = Buffer.concat(chunks);
+
+							if (transformResFn) {
+								const decompressedBody = await decompress(body, encoding ?? '');
+								let transformedBody = await transformResFn(decompressedBody, proxyRes, proxyReq);
+
+								if (transformedBody && transformedBody !== body) {
+									transformedBody = Buffer.isBuffer(transformedBody) ? transformedBody : Buffer.from(transformedBody);
+									const compressedBody = await compress(transformedBody, encoding ?? '');
+
+									const headers = { ...proxyRes.headers };
+									if (encoding) {
+										headers['content-encoding'] = encoding;
+										headers['content-length'] = Buffer.byteLength(compressedBody).toString();
+									} else {
+										delete headers['content-encoding'];
+										headers['content-length'] = Buffer.byteLength(compressedBody).toString();
+									}
+
+									res.writeHead(proxyRes.statusCode, headers);
+									res.end(compressedBody);
+									return;
+								}
 							}
+
+							res.writeHead(proxyRes.statusCode, proxyRes.headers);
+							res.end(body);
 						});
 					});
 
-					pipeline(req, proxyReq, (err) => {
-						if (err) {
-							logError(`Error piping request to origin: ${err}`);
-							res.statusCode = 502;
-							res.end('Bad Gateway');
-						}
-					});
+					req.pipe(proxyReq);
 
 					proxyReq.on('error', (err: any) => {
 						logError(`Proxy request error: ${err}`);

@@ -32,6 +32,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"chokidar-cli": "^3.0.0"
+		"chokidar-cli": "^3.0.0",
+		"zlib": "^1.0.5"
 	}
 }
