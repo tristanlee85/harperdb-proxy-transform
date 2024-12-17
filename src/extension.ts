@@ -129,11 +129,11 @@ export function start(options: any) {
 						await transformReqFn(req);
 					}
 
+					// TODO: this property will should be defined by the edge-control-parser extension
 					req.edgio = {
 						scheme: 'https',
 						host: 'www.google.com',
 					};
-					// override host header
 					req.headers.host = 'www.google.com';
 
 					const protocol = req.edgio?.scheme === 'https' ? https : http;
