@@ -18,27 +18,6 @@ const [logInfo, logDebug, logError, logWarn] = ['info', 'debug', 'error', 'warn'
 });
 
 /**
- * Define a list of allowed hosts to validate an incoming `x-forwarded-host`
- * header that could be used to make this more dynamic in the future.
- *
- * Validating the incoming host should help prevent abuse by restricting
- * the passed host header to the allowedHosts list.
- */
-const allowedHosts = new Set(['83c5-2600-1700-f2e0-b0f-74f7-c2c1-a4ad-e69d.ngrok-free.app']);
-
-/**
- *
- * The 'proxy' library accepts a function to determine the proxy host.
- *
- * @param {IncomingMessage} param0
- * @returns {string} Hostname
- */
-const determineProxyHost = ({ headers }: { headers: Record<string, string> }) => {
-	// Return the hostname (TODO: make this more dynamic)
-	return 'https://www.google.com';
-};
-
-/**
  * @typedef {Object} ExtensionOptions - The configuration options for the extension.
  * @property {string=} transformerPath - A path to a transformer file to be used by the Express.js server.
  */

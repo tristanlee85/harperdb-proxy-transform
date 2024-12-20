@@ -39,7 +39,6 @@ var [logInfo, logDebug, logError, logWarn] = ["info", "debug", "error", "warn"].
     fn(`[harperdb-proxy-transform] ${message}`);
   };
 });
-var allowedHosts = new Set(["83c5-2600-1700-f2e0-b0f-74f7-c2c1-a4ad-e69d.ngrok-free.app"]);
 function assertType(name, option, expectedType) {
   if (option) {
     const found = typeof option;
